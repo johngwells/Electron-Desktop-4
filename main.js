@@ -12,6 +12,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1000,
     height: 800,
+    frame: false,
     webPreferences: {
       // --- !! IMPORTANT !! ---
       // Disable 'contextIsolation' to allow 'nodeIntegration'
@@ -19,7 +20,8 @@ function createWindow() {
       contextIsolation: false,
       nodeIntegration: true
     },
-    backgroundColor: '#2B2E3B'
+    backgroundColor: '#2B2E3B',
+    titleBarStyle: 'hidden'
   });
 
   secondaryWindow = new BrowserWindow({
@@ -28,6 +30,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true
     },
+    frame: false,
     parent: mainWindow,
     // modal: true,
     // show: false
@@ -47,7 +50,7 @@ function createWindow() {
     }, 1000)
   }, 1000)
   */
- 
+
   // show after everything loads. this could add a delay. You could add bg color instead
   // mainWindow.once('ready-to-show', mainWindow.show);
 
