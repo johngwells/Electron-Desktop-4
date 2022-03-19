@@ -21,6 +21,7 @@
     "nodemon": "^2.0.0"
   },
   "dependencies": {
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "electron-window-state": "^5.0.3"
   }
 }

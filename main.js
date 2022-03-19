@@ -1,5 +1,6 @@
 // Modules
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, webContents } = require('electron');
+const windowStateKeeper = require('electron-window-state');
 const colors = require('colors');
 
 console.log(colors.rainbow('Hello World'));
@@ -9,9 +10,17 @@ let mainWindow, secondaryWindow;
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
+  let winState = windowStateKeeper({
+    defaultWidth: 1000,
+    defaultHeight: 800
+  });
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 800,
+    width: winState.width,
+    height: winState.height,
+    x: winState.x,
+    y: winState.y,
+    minWidth: 600,
+    minHeight: 480,
     frame: false,
     webPreferences: {
       // --- !! IMPORTANT !! ---
@@ -31,14 +40,20 @@ function createWindow() {
       nodeIntegration: true
     },
     frame: false,
-    parent: mainWindow,
+    titleBarStyle: 'hidden',
+    parent: mainWindow
     // modal: true,
     // show: false
   });
 
+  winState.manage(mainWindow);
+
   // Load index.html into the new BrowserWindow
   mainWindow.loadFile('index.html');
-  secondaryWindow.loadFile('secondary.html')
+  secondaryWindow.loadFile('secondary.html');
+
+  // User Auth
+  // mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
 
   // to see how a modal popup works. Should programmatically have an action for the user to close window
   /*
@@ -53,6 +68,59 @@ function createWindow() {
 
   // show after everything loads. this could add a delay. You could add bg color instead
   // mainWindow.once('ready-to-show', mainWindow.show);
+
+  // webcontents
+  let wc = mainWindow.webContents;
+
+  wc.on('did-finish-load', () => {
+    console.log('Content Fully Loaded');
+  });
+
+  wc.on('dom-ready', () => {
+    console.log('DOM Ready');
+  });
+
+  wc.on('new-window', (e, url) => {
+    e.preventDefault();
+    console.log('Created new window');
+  });
+
+  // two events get logged keyDown & keyUp and the key pressed
+  wc.on('before-input-event', (e, input) => {
+    console.log(`${input.key} : ${input.type}`);
+  });
+
+  wc.on('media-started-playing', () => {
+    console.log('media playing');
+  });
+
+  wc.on('media-paused', () => {
+    console.log('media paused');
+  });
+
+  // Right clicking with context-menu
+  wc.on('context-menu', (e, params) => {
+    console.log(
+      `Context menu opened on: ${params.mediaType} at x:${params.x} y:${params.y}`
+    );
+    console.log(`User selected text: ${params.selectionText}`);
+    console.log(`Selection can be copied ${params.editFlags.canCopy}`);
+
+    let selectedText = params.selectionText;
+    wc.executeJavaScript(`alert('${selectedText}')`);
+  });
+
+  /* User Auth
+  wc.on('login', (e, request, authInfo, callback) => {
+    console.log('loggin in');
+    callback('user', 'passwd');
+  });
+
+  wc.on('did-navigate', (e, url, statusCode, message) => {
+    console.log(`Navigated to ${url}`);
+    console.log(statusCode);
+  });
+  */
 
   // Open DevTools - Remove for PRODUCTION!
   mainWindow.webContents.openDevTools();
