@@ -12,7 +12,8 @@ let mainWindow, secondaryWindow;
 function createWindow() {
   // let customSes = session.fromPartition('persist:part1')
   // must add session: customSes in mainWindow options.
-  let sesCookie = session.defaultSession;
+  // let sesCookie = session.defaultSession;
+  let ses = session.defaultSession;
 
   let getCookies = () => {
     sesCookie.cookies
@@ -64,7 +65,7 @@ function createWindow() {
   });
 
   // Session: local storage & Cookies
-  let ses = mainWindow.webContents.session;
+  // let ses = mainWindow.webContents.session;
   let ses2 = secondaryWindow.webContents.session;
   let defaultSes = session.defaultSession;
 
@@ -95,10 +96,10 @@ function createWindow() {
   // });
 
   // remove cookie
-  sesCookie.cookies.remove('https://myappdomain.com', 'cookie').then(() => {
-    console.log('cookie gone');
-    getCookies();
-  });
+  // sesCookie.cookies.remove('https://myappdomain.com', 'cookie').then(() => {
+  //   console.log('cookie gone');
+  //   getCookies();
+  // });
 
   // User Auth
   // mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
@@ -116,6 +117,34 @@ function createWindow() {
 
   // show after everything loads. this could add a delay. You could add bg color instead
   // mainWindow.once('ready-to-show', mainWindow.show);
+
+  // Download
+  ses.on('will-download', async (e, downloadItem, webContents) => {
+    console.log('Start Downloading');
+    let filename = downloadItem.getFilename();
+
+    // let filesize = downloadItem.get
+    // cant get fileSize from downloadItem.getTotalBytes
+    
+    let fileSize = 123079;
+    console.log({ filename });
+    console.log({ fileSize });
+
+    // Save to desktop
+    downloadItem.setSavePath(app.getPath('desktop') + `/${filename}`);
+
+    downloadItem.on('updated', (e, state) => {
+      let received = downloadItem.getReceivedBytes();
+      console.log({ fileSize })
+      console.log({ received });
+
+      if (state === 'progressing' && received) {
+        let value = Math.round((received / fileSize) * 100);
+        webContents.executeJavaScript(`window.progress.value = ${value}`)
+        console.log(value)
+      }
+    });
+  });
 
   // webcontents
   let wc = mainWindow.webContents;

@@ -2,3 +2,12 @@
   user-select: none;
   -webkit-app-region: drag;
 }
+
+.flex {
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: salmon;
+}
