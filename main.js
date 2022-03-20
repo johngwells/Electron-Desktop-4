@@ -48,7 +48,16 @@ let trayMenu = Menu.buildFromTemplate([
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
-  console.log(screen.getAllDisplays())
+  let displays = screen.getAllDisplays();
+
+  // example, you can change the mainWindow width/height to half the size of the main screen. 
+  // x/y to the bounds
+  // width / 2|| height / 2
+  console.log(`${displays[0].size.width} x ${displays[0].size.height}`)
+  console.log(`${displays[0].bounds.x} x ${displays[0].bounds.y}`)
+  // same for secondary window displays[1]
+
+
   createTray();
   // let customSes = session.fromPartition('persist:part1')
   // must add session: customSes in mainWindow options.
