@@ -1,21 +1,55 @@
 // Modules
+const electron = require('electron');
 const {
   app,
   BrowserWindow,
   webContents,
   session,
-  dialog
-} = require('electron');
+  dialog,
+  globalShortcut,
+  Menu,
+  MenuItem,
+  Tray,
+  screen
+} = electron;
+
+const menuItems = require('./main-menu');
 const windowStateKeeper = require('electron-window-state');
 const colors = require('colors');
 
 console.log(colors.rainbow('Hello World'));
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, secondaryWindow;
+let mainWindow, secondaryWindow, tray;
+
+function createTray() {
+  tray = new Tray('trayTemplate@2x.png');
+  tray.setToolTip('App Details');
+
+  // tray.on('click', e => {
+  //   if (e.shiftKey) {
+  //     app.quit();
+  //   } else {
+  //     mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+  //   }
+  // });
+
+  // when using setContext it will ignore 'click so it's one or the other
+  tray.setContextMenu(trayMenu);
+}
+
+let mainMenu = Menu.buildFromTemplate(menuItems);
+let trayMenu = Menu.buildFromTemplate([
+  {
+    label: 'Item 1'
+  },
+  { role: 'quit' }
+]);
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
+  console.log(screen.getAllDisplays())
+  createTray();
   // let customSes = session.fromPartition('persist:part1')
   // must add session: customSes in mainWindow options.
   // let sesCookie = session.defaultSession;
@@ -68,6 +102,12 @@ function createWindow() {
     partition: 'persist:letsgo'
     // modal: true,
     // show: false
+  });
+
+  Menu.setApplicationMenu(mainMenu);
+
+  mainWindow.webContents.on('context-menu', e => {
+    mainMenu.popup(mainWindow);
   });
 
   // Session: local storage & Cookies
@@ -182,16 +222,16 @@ function createWindow() {
   });
 
   // Right clicking with context-menu
-  wc.on('context-menu', (e, params) => {
-    console.log(
-      `Context menu opened on: ${params.mediaType} at x:${params.x} y:${params.y}`
-    );
-    console.log(`User selected text: ${params.selectionText}`);
-    console.log(`Selection can be copied ${params.editFlags.canCopy}`);
+  // wc.on('context-menu', (e, params) => {
+  //   console.log(
+  //     `Context menu opened on: ${params.mediaType} at x:${params.x} y:${params.y}`
+  //   );
+  //   console.log(`User selected text: ${params.selectionText}`);
+  //   console.log(`Selection can be copied ${params.editFlags.canCopy}`);
 
-    let selectedText = params.selectionText;
-    wc.executeJavaScript(`alert('${selectedText}')`);
-  });
+  //   let selectedText = params.selectionText;
+  //   wc.executeJavaScript(`alert('${selectedText}')`);
+  // });
 
   /* User Auth
   wc.on('login', (e, request, authInfo, callback) => {
@@ -221,13 +261,11 @@ function createWindow() {
     //   .then(result => {
     //     console.log(result);
     //   });
-
     // show the save path
     // dialog
     //   .showSaveDialog({}).then(result => {
     //     console.log(result)
     //   })
-
     // options message box
     // const answers = ['Yes', 'No', 'Maybe'];
     // dialog.showMessageBox({
@@ -242,6 +280,20 @@ function createWindow() {
 
   // Open DevTools - Remove for PRODUCTION!
   mainWindow.webContents.openDevTools();
+
+  globalShortcut.register('CommandOrControl+G', () => {
+    console.log('User pressed G');
+  });
+
+  electron.powerMonitor.on('suspend', e => {
+    console.log('Save data before going to sleep')
+  })
+
+  electron.powerMonitor.on('resume', e => {
+    if (!mainWindow) {
+      createWindow();
+    }
+  })
 
   // Listen for window being closed
   mainWindow.on('closed', () => {
