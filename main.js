@@ -1,5 +1,5 @@
 // Modules
-const { app, BrowserWindow, webContents } = require('electron');
+const { app, BrowserWindow, webContents, session } = require('electron');
 const windowStateKeeper = require('electron-window-state');
 const colors = require('colors');
 
@@ -10,6 +10,21 @@ let mainWindow, secondaryWindow;
 
 // Create a new BrowserWindow when `app` is ready
 function createWindow() {
+  // let customSes = session.fromPartition('persist:part1')
+  // must add session: customSes in mainWindow options.
+  let sesCookie = session.defaultSession;
+
+  let getCookies = () => {
+    sesCookie.cookies
+      .get({})
+      .then(cookies => {
+        console.log(cookies);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   let winState = windowStateKeeper({
     defaultWidth: 1000,
     defaultHeight: 800
@@ -27,7 +42,8 @@ function createWindow() {
       // Disable 'contextIsolation' to allow 'nodeIntegration'
       // 'contextIsolation' defaults to "true" as from Electron v12
       contextIsolation: false,
-      nodeIntegration: true
+      nodeIntegration: true,
+      worldSafeExecuteJavaScript: true
     },
     backgroundColor: '#2B2E3B',
     titleBarStyle: 'hidden'
@@ -41,16 +57,48 @@ function createWindow() {
     },
     frame: false,
     titleBarStyle: 'hidden',
-    parent: mainWindow
+    parent: mainWindow,
+    partition: 'persist:letsgo'
     // modal: true,
     // show: false
   });
+
+  // Session: local storage & Cookies
+  let ses = mainWindow.webContents.session;
+  let ses2 = secondaryWindow.webContents.session;
+  let defaultSes = session.defaultSession;
+
+  // console.log(ses.getUserAgent());
+  // console.log(Object.is(ses, customSes));
 
   winState.manage(mainWindow);
 
   // Load index.html into the new BrowserWindow
   mainWindow.loadFile('index.html');
   secondaryWindow.loadFile('secondary.html');
+
+  // comment out when using test cookies below
+  // let cookie = {
+  //   url: 'https://myappdomain.com',
+  //   name: 'cookie',
+  //   value: 'myCookie',
+  //   expirationDate: 1679271122.326472
+  // };
+  // ses.cookies.set(cookie).then(() => {
+  //   console.log('cookie set');
+  //   getCookies();
+  // });
+
+  //  test cookies
+  // mainWindow.webContents.on('did-finish-load', e => {
+  //   getCookies();
+  // });
+
+  // remove cookie
+  sesCookie.cookies.remove('https://myappdomain.com', 'cookie').then(() => {
+    console.log('cookie gone');
+    getCookies();
+  });
 
   // User Auth
   // mainWindow.loadURL('https://httpbin.org/basic-auth/user/passwd');
