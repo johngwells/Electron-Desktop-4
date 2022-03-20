@@ -1,5 +1,11 @@
 // Modules
-const { app, BrowserWindow, webContents, session } = require('electron');
+const {
+  app,
+  BrowserWindow,
+  webContents,
+  session,
+  dialog
+} = require('electron');
 const windowStateKeeper = require('electron-window-state');
 const colors = require('colors');
 
@@ -125,7 +131,7 @@ function createWindow() {
 
     // let filesize = downloadItem.get
     // cant get fileSize from downloadItem.getTotalBytes
-    
+
     let fileSize = 123079;
     console.log({ filename });
     console.log({ fileSize });
@@ -135,13 +141,13 @@ function createWindow() {
 
     downloadItem.on('updated', (e, state) => {
       let received = downloadItem.getReceivedBytes();
-      console.log({ fileSize })
+      console.log({ fileSize });
       console.log({ received });
 
       if (state === 'progressing' && received) {
         let value = Math.round((received / fileSize) * 100);
-        webContents.executeJavaScript(`window.progress.value = ${value}`)
-        console.log(value)
+        webContents.executeJavaScript(`window.progress.value = ${value}`);
+        console.log(value);
       }
     });
   });
@@ -198,6 +204,41 @@ function createWindow() {
     console.log(statusCode);
   });
   */
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    // mult select
+    // dialog
+    //   .showOpenDialog({
+    //     buttonLabel: 'Select a photo',
+    //     defaultPath: app.getPath('desktop'),
+    //     properties: [
+    //       'multiSelections',
+    //       'createDirectory',
+    //       'openFile',
+    //       'openDirectory'
+    //     ]
+    //   })
+    //   .then(result => {
+    //     console.log(result);
+    //   });
+
+    // show the save path
+    // dialog
+    //   .showSaveDialog({}).then(result => {
+    //     console.log(result)
+    //   })
+
+    // options message box
+    // const answers = ['Yes', 'No', 'Maybe'];
+    // dialog.showMessageBox({
+    //   title: 'Message Box',
+    //   message: 'Please select an option',
+    //   detail: 'Message details',
+    //   buttons: answers
+    // }).then(result => {
+    //   console.log(`User selected: ${answers[result.response]}`)
+    // })
+  });
 
   // Open DevTools - Remove for PRODUCTION!
   mainWindow.webContents.openDevTools();
