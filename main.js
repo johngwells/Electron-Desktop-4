@@ -149,6 +149,11 @@ function createWindow() {
     return askMe();
   });
 
+  // handle image conversion
+  ipcMain.handle('image-path', () => {
+    return app.getPath('desktop');
+  });
+
   mainWindow.webContents.on('context-menu', e => {
     mainMenu.popup(mainWindow);
   });

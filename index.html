@@ -19,18 +19,26 @@
 
 <body class="flex">
   <div class="draggable" style="padding-top: 10px"></div>
-  <h3><a href='javascript:' onclick='newWin()'>New Window</a></h3>
+  <h3><a id='newWin'>New Window</a></h3>
   <h1>Hello World!</h1>
   <textarea rows="8" cols="80"></textarea>
-
+  <img src="" id="preview" style="Object-fit:none"/>
+  <img src="" id="cbImage" style="Object-fit:none"/>
   <p>Build cross-platform desktop apps with JavaScript, HTML, and CSS</p>
   <a target="_blank" href="https://placekitten.com/500/500"><span>Kitten</span></a>
 
   <button id="ask">Ask me</button>
+  <button id="showSite">Launch site with shell</button>
+  <button id="splash">Splash Image</button>
+  <button id="showFile">Show File</button>
+  <button id="showClipboardImage">Show Clipboard Image</button>
+  <button id="deleteFile">Move To Trash</button>
+  <button id="convertImage">Convert to JPEG</button>
+  <button id="displayPreviewImage">Display Preview Image</button>
 
-  <button onclick="zoomUp()">Increase Zoom</button>
-  <button onclick="zoomDown()">Decrease Zoom</button>
-  <button onclick="zoomReset()">Reset Zoom</button>
+  <button id="zoomUp">Increase Zoom</button>
+  <button id="zoomDown">Decrease Zoom</button>
+  <button id="zoomReset">Reset Zoom</button>
   <!-- <span><a href='splash.png' download>Download Image</a></span> -->
   <h2><a href='https://github.com/exaile/exaile-test-files/blob/master/art.mp3' download>Download Mp3</a></h2>
   <progress value="0" max="100" id="progress"></progress>
