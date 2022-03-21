@@ -23,6 +23,17 @@ console.log(colors.rainbow('Hello World'));
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, secondaryWindow, tray;
 
+async function askMe() {
+  let me = ['programmer', 'musician', 'traveling merchant'];
+
+  let choice = await dialog.showMessageBox({
+    message: 'Pick an option',
+    buttons: me
+  });
+
+  return me[choice.response];
+}
+
 function createTray() {
   tray = new Tray('trayTemplate@2x.png');
   tray.setToolTip('App Details');
@@ -118,13 +129,24 @@ function createWindow() {
   // IPC
   ipcMain.on('channel1', (e, args) => {
     console.log(args);
-    e.sender.send('channel1-response', 'Message received on channel1 ')
+    e.sender.send('channel1-response', 'Message received on channel1 ');
   });
 
   // Sync blocks
   ipcMain.on('sync-message', (e, args) => {
     console.log(args);
-    e.returnValue = 'sync response from main process'
+    e.returnValue = 'sync response from main process';
+  });
+
+  // ipcMain.on('ask', e => {
+  //   askMe().then(answer => {
+  //     e.reply('answer', answer)
+  //   })
+  // })
+
+  // using invoke/handle will make more dense applications more manageable
+  ipcMain.handle('ask', e => {
+    return askMe();
   });
 
   mainWindow.webContents.on('context-menu', e => {
@@ -224,7 +246,7 @@ function createWindow() {
       from: 'Johnny',
       email: 'myEmail@.com',
       priority: 1
-    })
+    });
     // Sync messaging
     // mainWindow.webContents.send('mailbox', {
     //   message: 'You Have Mail',
@@ -233,8 +255,6 @@ function createWindow() {
     //   priority: 1
     // })
   });
-
-  
 
   wc.on('dom-ready', () => {
     console.log('DOM Ready');

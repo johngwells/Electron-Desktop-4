@@ -7,7 +7,7 @@ const { webFrame, ipcRenderer } = electron;
 document.getElementById('talk').addEventListener('click', e => {
   ipcRenderer.send('channel1', 'Hello from main window!');
   let response = ipcRenderer.sendSync('sync-message', 'Hello from Sync');
-  console.log(response)
+  console.log(response);
 });
 
 ipcRenderer.on('channel1-response', (e, args) => {
@@ -15,8 +15,18 @@ ipcRenderer.on('channel1-response', (e, args) => {
 });
 
 ipcRenderer.on('mailbox', (e, args) => {
-  console.log(args)
+  console.log(args);
 });
+
+document.getElementById('ask').addEventListener('click', e => {
+  ipcRenderer.invoke('ask').then(answer => {
+    console.log(answer)
+  })
+});
+
+// ipcRenderer.on('answer', (e, args) => {
+//   console.log(args);
+// });
 
 let win;
 
