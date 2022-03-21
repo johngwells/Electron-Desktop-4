@@ -10,7 +10,8 @@ const {
   Menu,
   MenuItem,
   Tray,
-  screen
+  screen,
+  ipcMain
 } = electron;
 
 const menuItems = require('./main-menu');
@@ -50,13 +51,12 @@ let trayMenu = Menu.buildFromTemplate([
 function createWindow() {
   let displays = screen.getAllDisplays();
 
-  // example, you can change the mainWindow width/height to half the size of the main screen. 
+  // example, you can change the mainWindow width/height to half the size of the main screen.
   // x/y to the bounds
   // width / 2|| height / 2
-  console.log(`${displays[0].size.width} x ${displays[0].size.height}`)
-  console.log(`${displays[0].bounds.x} x ${displays[0].bounds.y}`)
+  console.log(`${displays[0].size.width} x ${displays[0].size.height}`);
+  console.log(`${displays[0].bounds.x} x ${displays[0].bounds.y}`);
   // same for secondary window displays[1]
-
 
   createTray();
   // let customSes = session.fromPartition('persist:part1')
@@ -92,8 +92,7 @@ function createWindow() {
       // Disable 'contextIsolation' to allow 'nodeIntegration'
       // 'contextIsolation' defaults to "true" as from Electron v12
       contextIsolation: false,
-      nodeIntegration: true,
-      worldSafeExecuteJavaScript: true
+      nodeIntegration: true
     },
     backgroundColor: '#2B2E3B',
     titleBarStyle: 'hidden'
@@ -103,6 +102,7 @@ function createWindow() {
     width: 600,
     height: 300,
     webPreferences: {
+      contextIsolation: false,
       nodeIntegration: true
     },
     frame: false,
@@ -114,6 +114,18 @@ function createWindow() {
   });
 
   Menu.setApplicationMenu(mainMenu);
+
+  // IPC
+  ipcMain.on('channel1', (e, args) => {
+    console.log(args);
+    e.sender.send('channel1-response', 'Message received on channel1 ')
+  });
+
+  // Sync blocks
+  ipcMain.on('sync-message', (e, args) => {
+    console.log(args);
+    e.returnValue = 'sync response from main process'
+  });
 
   mainWindow.webContents.on('context-menu', e => {
     mainMenu.popup(mainWindow);
@@ -206,14 +218,30 @@ function createWindow() {
 
   wc.on('did-finish-load', () => {
     console.log('Content Fully Loaded');
+    // Async messaging
+    mainWindow.webContents.send('mailbox', {
+      message: 'You Have Mail',
+      from: 'Johnny',
+      email: 'myEmail@.com',
+      priority: 1
+    })
+    // Sync messaging
+    // mainWindow.webContents.send('mailbox', {
+    //   message: 'You Have Mail',
+    //   from: 'Johnny',
+    //   email: 'myEmail@.com',
+    //   priority: 1
+    // })
   });
+
+  
 
   wc.on('dom-ready', () => {
     console.log('DOM Ready');
   });
 
   wc.on('new-window', (e, url) => {
-    e.preventDefault();
+    // e.preventDefault();
     console.log('Created new window');
   });
 
@@ -288,21 +316,21 @@ function createWindow() {
   });
 
   // Open DevTools - Remove for PRODUCTION!
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
   globalShortcut.register('CommandOrControl+G', () => {
     console.log('User pressed G');
   });
 
   electron.powerMonitor.on('suspend', e => {
-    console.log('Save data before going to sleep')
-  })
+    console.log('Save data before going to sleep');
+  });
 
   electron.powerMonitor.on('resume', e => {
     if (!mainWindow) {
       createWindow();
     }
-  })
+  });
 
   // Listen for window being closed
   mainWindow.on('closed', () => {

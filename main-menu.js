@@ -24,7 +24,9 @@ module.exports = [
           console.log('Hello World');
         },
         accelerator: 'Shift+G'
-      }
+      },
+      { role: 'toggleDevTools'},
+      { role: 'reload'}
     ]
   }
 ];

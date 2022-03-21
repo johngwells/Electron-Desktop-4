@@ -1,31 +1,43 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <!-- !! IMPORTANT !! -->
-    <!-- Content-Security-Policy no longer required. Will show warning in devtools. Can be ignored -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <title>Hello World!</title>
-    <style>
-      html { font-family: sans-serif; background: #2B2E3B; color: #9FEAF9; }
-    </style>
-  </head>
-  <body class="flex">
-    <div class="draggable" style="padding-top: 10px"></div>
-    <h1>Hello World!</h1>
-    
-    <textarea rows="8" cols="80"></textarea>
 
-    <p>Build cross-platform desktop apps with JavaScript, HTML, and CSS</p>
-    <a target="_blank" href="https://placekitten.com/500/500"><span>Kitten</span></a>
-    <!-- <span><a href='splash.png' download>Download Image</a></span> -->
-    <h2><a href='https://github.com/exaile/exaile-test-files/blob/master/art.mp3' download>Download Mp3</a></h2>
-    <progress value="0" max="100" id="progress"></progress>
-    <video src="./Venice_10.mp4" controls width="650" />
-    <script>
-      // You can also require other files to run in this process
-      require('./renderer.js')
-    </script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <!-- !! IMPORTANT !! -->
+  <!-- Content-Security-Policy no longer required. Will show warning in devtools. Can be ignored -->
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <title>Hello World!</title>
+  <style>
+    html {
+      font-family: sans-serif;
+      background: #2B2E3B;
+      color: #9FEAF9;
+    }
+  </style>
+</head>
+
+<body class="flex">
+  <div class="draggable" style="padding-top: 10px"></div>
+  <h3><a href='javascript:' onclick='newWin()'>New Window</a></h3>
+  <h1>Hello World!</h1>
+  <textarea rows="8" cols="80"></textarea>
+
+  <p>Build cross-platform desktop apps with JavaScript, HTML, and CSS</p>
+  <a target="_blank" href="https://placekitten.com/500/500"><span>Kitten</span></a>
+
+  <button onclick="zoomUp()">Increase Zoom</button>
+  <button onclick="zoomDown()">Decrease Zoom</button>
+  <button onclick="zoomReset()">Reset Zoom</button>
+  <!-- <span><a href='splash.png' download>Download Image</a></span> -->
+  <h2><a href='https://github.com/exaile/exaile-test-files/blob/master/art.mp3' download>Download Mp3</a></h2>
+  <progress value="0" max="100" id="progress"></progress>
+  <button id="talk">Talk to main process</button>
+  <video src="./Venice_10.mp4" controls width="650" />
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js')
+  </script>
+</body>
+
 </html>
